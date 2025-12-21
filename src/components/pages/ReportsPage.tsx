@@ -505,7 +505,8 @@ export default function ReportsPage() {
             </div>
           </div>
         </div>
-      )}
+      )
+      })()}
 
       {/* Archive Confirmation Modal */}
       {showArchiveModal && (
@@ -531,8 +532,7 @@ export default function ReportsPage() {
             </div>
           </div>
         </div>
-      )
-      })()}
+      )}
     </div>
   )
 }
