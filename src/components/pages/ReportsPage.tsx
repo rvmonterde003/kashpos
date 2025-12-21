@@ -6,13 +6,8 @@ import { Sale, PaymentMethod, CustomerType } from '@/types/database'
 import { format, startOfDay, endOfDay } from 'date-fns'
 import toast from 'react-hot-toast'
 
-interface ExtendedSale extends Sale {
-  store_sale_datetime?: string
-  transaction_id?: string
-}
-
 export default function ReportsPage() {
-  const [sales, setSales] = useState<ExtendedSale[]>([])
+  const [sales, setSales] = useState<Sale[]>([])
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
   const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,13 +92,13 @@ export default function ReportsPage() {
       // Generate CSV with transaction grouping
       const csvHeaders = ['Transaction ID', 'Item Name', 'Payment Method', 'Customer Type', 'Dine In/Takeout', 'System DateTime', 'Store DateTime', 'Quantity', 'Total']
       const csvRows = salesToArchive.map((s) => [
-        (s as ExtendedSale).transaction_id || s.id,
+        s.transaction_id || s.id,
         s.product_name,
         s.payment_method,
         s.customer_type,
         s.dine_in_takeout || 'N/A',
         format(new Date(s.created_at), 'yyyy-MM-dd HH:mm:ss'),
-        format(new Date((s as ExtendedSale).store_sale_datetime || s.created_at), 'yyyy-MM-dd HH:mm:ss'),
+        format(new Date(s.store_sale_datetime || s.created_at), 'yyyy-MM-dd HH:mm:ss'),
         s.qty,
         s.total.toFixed(2),
       ])
@@ -161,8 +156,8 @@ export default function ReportsPage() {
     try {
       // Update all sales in the same transaction
       const sale = sales.find(s => s.id === saleId)
-      if (sale && (sale as ExtendedSale).transaction_id) {
-        const transactionId = (sale as ExtendedSale).transaction_id
+      if (sale && sale.transaction_id) {
+        const transactionId = sale.transaction_id
         const { error } = await (supabase as any)
           .from('sales')
           .update({ store_sale_datetime: new Date(newDateTime).toISOString() })
@@ -172,7 +167,7 @@ export default function ReportsPage() {
 
         setSales((prev) =>
           prev.map((s) => 
-            (s as ExtendedSale).transaction_id === transactionId 
+            s.transaction_id === transactionId 
               ? { ...s, store_sale_datetime: new Date(newDateTime).toISOString() } 
               : s
           )
@@ -246,13 +241,13 @@ export default function ReportsPage() {
       {(() => {
         // Group sales by transaction_id
         const groupedSales = sales.reduce((acc, sale) => {
-          const transactionId = (sale as ExtendedSale).transaction_id || sale.id
+          const transactionId = sale.transaction_id || sale.id
           if (!acc[transactionId]) {
             acc[transactionId] = []
           }
           acc[transactionId].push(sale)
           return acc
-        }, {} as Record<string, ExtendedSale[]>)
+        }, {} as Record<string, Sale[]>)
 
         // Sort transactions by most recent
         const sortedTransactions = Object.entries(groupedSales).sort((a, b) => {
@@ -355,7 +350,7 @@ export default function ReportsPage() {
                                 onChange={(e) => {
                                   handleUpdateSale(sale.id, 'payment_method', e.target.value)
                                   // Update all sales in transaction
-                                  if ((sale as ExtendedSale).transaction_id) {
+                                  if (sale.transaction_id) {
                                     transactionSales.forEach(s => {
                                       if (s.id !== sale.id) {
                                         handleUpdateSale(s.id, 'payment_method', e.target.value)
@@ -387,7 +382,7 @@ export default function ReportsPage() {
                                 onChange={(e) => {
                                   handleUpdateSale(sale.id, 'customer_type', e.target.value)
                                   // Update all sales in transaction
-                                  if ((sale as ExtendedSale).transaction_id) {
+                                  if (sale.transaction_id) {
                                     transactionSales.forEach(s => {
                                       if (s.id !== sale.id) {
                                         handleUpdateSale(s.id, 'customer_type', e.target.value)
@@ -419,7 +414,7 @@ export default function ReportsPage() {
                                 onChange={(e) => {
                                   handleUpdateSale(sale.id, 'dine_in_takeout', e.target.value)
                                   // Update all sales in transaction
-                                  if ((sale as ExtendedSale).transaction_id) {
+                                  if (sale.transaction_id) {
                                     transactionSales.forEach(s => {
                                       if (s.id !== sale.id) {
                                         handleUpdateSale(s.id, 'dine_in_takeout', e.target.value)

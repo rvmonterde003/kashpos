@@ -4,10 +4,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Sale } from '@/types/database'
 import { format, startOfDay, endOfDay, subDays, eachDayOfInterval, parseISO } from 'date-fns'
-
-interface ExtendedSale extends Sale {
-  store_sale_datetime?: string
-}
 import {
   Chart as ChartJS,
   ArcElement,
@@ -47,7 +43,7 @@ const CHART_COLORS = [
 ]
 
 export default function EarningsPage() {
-  const [sales, setSales] = useState<ExtendedSale[]>([])
+  const [sales, setSales] = useState<Sale[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'today' | 'range'>('today')
   const [startDate, setStartDate] = useState<string>(format(subDays(new Date(), 7), 'yyyy-MM-dd'))
@@ -77,14 +73,14 @@ export default function EarningsPage() {
         const today = new Date()
         const dateStart = startOfDay(today)
         const dateEnd = endOfDay(today)
-        filteredSales = salesWithStoreDateTime.filter((s: ExtendedSale) => {
+        filteredSales = salesWithStoreDateTime.filter((s: Sale) => {
           const saleDate = new Date(s.store_sale_datetime || s.created_at)
           return saleDate >= dateStart && saleDate <= dateEnd
         })
       } else {
         const dateStart = startOfDay(new Date(startDate))
         const dateEnd = endOfDay(new Date(endDate))
-        filteredSales = salesWithStoreDateTime.filter((s: ExtendedSale) => {
+        filteredSales = salesWithStoreDateTime.filter((s: Sale) => {
           const saleDate = new Date(s.store_sale_datetime || s.created_at)
           return saleDate >= dateStart && saleDate <= dateEnd
         })
