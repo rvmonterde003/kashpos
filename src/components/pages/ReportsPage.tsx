@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Sale, PaymentMethod, CustomerType } from '@/types/database'
+import { useAuth } from '@/contexts/AuthContext'
 import { format, startOfDay, endOfDay, subDays } from 'date-fns'
 import toast from 'react-hot-toast'
 
@@ -25,6 +26,9 @@ interface Transaction {
 }
 
 export default function ReportsPage() {
+  const { user } = useAuth()
+  const isOwner = user?.role === 'owner'
+  
   const [sales, setSales] = useState<SaleWithEarnings[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
@@ -35,11 +39,11 @@ export default function ReportsPage() {
   const [startDate, setStartDate] = useState<string>(format(subDays(new Date(), 7), 'yyyy-MM-dd'))
   const [endDate, setEndDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'))
   
-  // Selection
+  // Selection (owner only)
   const [selectedTransactions, setSelectedTransactions] = useState<Set<string>>(new Set())
   const [showArchiveModal, setShowArchiveModal] = useState(false)
   
-  // Editing
+  // Editing (owner only)
   const [editingField, setEditingField] = useState<string | null>(null)
 
   const fetchSales = useCallback(async () => {
@@ -304,7 +308,7 @@ export default function ReportsPage() {
             />
           </div>
           
-          {selectedTransactions.size > 0 && (
+          {isOwner && selectedTransactions.size > 0 && (
             <button
               onClick={() => setShowArchiveModal(true)}
               className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
@@ -336,16 +340,18 @@ export default function ReportsPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {/* Select All */}
-          <div className="flex items-center gap-2 px-2">
-            <input
-              type="checkbox"
-              checked={selectedTransactions.size === transactions.length && transactions.length > 0}
-              onChange={toggleSelectAll}
-              className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500"
-            />
-            <span className="text-surface-400 text-sm">Select All ({transactions.length} transactions)</span>
-          </div>
+          {/* Select All - Owner only */}
+          {isOwner && (
+            <div className="flex items-center gap-2 px-2">
+              <input
+                type="checkbox"
+                checked={selectedTransactions.size === transactions.length && transactions.length > 0}
+                onChange={toggleSelectAll}
+                className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500"
+              />
+              <span className="text-surface-400 text-sm">Select All ({transactions.length} transactions)</span>
+            </div>
+          )}
 
           {/* Transactions Table */}
           <div className="card overflow-hidden">
@@ -353,7 +359,7 @@ export default function ReportsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-surface-800 bg-surface-800/50">
-                    <th className="p-4 text-left w-12"></th>
+                    {isOwner && <th className="p-4 text-left w-12"></th>}
                     <th className="p-4 text-left text-sm font-medium text-surface-400">Transaction #</th>
                     <th className="p-4 text-left text-sm font-medium text-surface-400">Items</th>
                     <th className="p-4 text-left text-sm font-medium text-surface-400">Payment</th>
@@ -371,14 +377,16 @@ export default function ReportsPage() {
                 <tbody>
                   {transactions.map((tx) => (
                     <tr key={tx.id} className="border-b border-surface-800/50 hover:bg-surface-800/30">
-                      <td className="p-4">
-                        <input
-                          type="checkbox"
-                          checked={selectedTransactions.has(tx.id)}
-                          onChange={() => toggleSelectTransaction(tx.id)}
-                          className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500"
-                        />
-                      </td>
+                      {isOwner && (
+                        <td className="p-4">
+                          <input
+                            type="checkbox"
+                            checked={selectedTransactions.has(tx.id)}
+                            onChange={() => toggleSelectTransaction(tx.id)}
+                            className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500"
+                          />
+                        </td>
+                      )}
                       <td className="p-4">
                         <span className="text-white font-mono text-sm">{tx.transaction_number}</span>
                       </td>
@@ -390,7 +398,7 @@ export default function ReportsPage() {
                         </div>
                       </td>
                       <td className="p-4">
-                        {editingField === `${tx.id}-payment` ? (
+                        {isOwner && editingField === `${tx.id}-payment` ? (
                           <select
                             value={tx.payment_method}
                             onChange={(e) => handleUpdateTransaction(tx.id, 'payment_method', e.target.value)}
@@ -402,17 +410,19 @@ export default function ReportsPage() {
                               <option key={pm.id} value={pm.name}>{pm.name}</option>
                             ))}
                           </select>
-                        ) : (
+                        ) : isOwner ? (
                           <button
                             onClick={() => setEditingField(`${tx.id}-payment`)}
                             className="text-surface-300 hover:text-white text-sm"
                           >
                             {tx.payment_method}
                           </button>
+                        ) : (
+                          <span className="text-surface-300 text-sm">{tx.payment_method}</span>
                         )}
                       </td>
                       <td className="p-4">
-                        {editingField === `${tx.id}-customer` ? (
+                        {isOwner && editingField === `${tx.id}-customer` ? (
                           <select
                             value={tx.customer_type}
                             onChange={(e) => handleUpdateTransaction(tx.id, 'customer_type', e.target.value)}
@@ -424,17 +434,19 @@ export default function ReportsPage() {
                               <option key={ct.id} value={ct.name}>{ct.name}</option>
                             ))}
                           </select>
-                        ) : (
+                        ) : isOwner ? (
                           <button
                             onClick={() => setEditingField(`${tx.id}-customer`)}
                             className="text-surface-300 hover:text-white text-sm"
                           >
                             {tx.customer_type}
                           </button>
+                        ) : (
+                          <span className="text-surface-300 text-sm">{tx.customer_type}</span>
                         )}
                       </td>
                       <td className="p-4">
-                        {editingField === `${tx.id}-order` ? (
+                        {isOwner && editingField === `${tx.id}-order` ? (
                           <select
                             value={tx.dine_in_takeout}
                             onChange={(e) => handleUpdateTransaction(tx.id, 'dine_in_takeout', e.target.value)}
@@ -446,23 +458,20 @@ export default function ReportsPage() {
                             <option value="takeout">Takeout</option>
                           </select>
                         ) : (
-                          <button
-                            onClick={() => setEditingField(`${tx.id}-order`)}
-                            className={`px-2 py-1 rounded text-xs font-medium ${
-                              tx.dine_in_takeout === 'dine_in' 
-                                ? 'bg-blue-500/20 text-blue-400' 
-                                : 'bg-green-500/20 text-green-400'
-                            }`}
-                          >
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${
+                            tx.dine_in_takeout === 'dine_in' 
+                              ? 'bg-blue-500/20 text-blue-400' 
+                              : 'bg-green-500/20 text-green-400'
+                          }`}>
                             {tx.dine_in_takeout === 'dine_in' ? 'Dine In' : 'Takeout'}
-                          </button>
+                          </span>
                         )}
                       </td>
                       <td className="p-4 text-surface-500 text-sm font-mono">
                         {format(new Date(tx.created_at), 'MMM d yyyy h:mm a')}
                       </td>
                       <td className="p-4">
-                        {editingField === `${tx.id}-earnings` ? (
+                        {isOwner && editingField === `${tx.id}-earnings` ? (
                           <input
                             type="datetime-local"
                             defaultValue={format(new Date(tx.earnings_datetime), "yyyy-MM-dd'T'HH:mm")}
@@ -471,13 +480,17 @@ export default function ReportsPage() {
                             autoFocus
                             className="px-2 py-1 bg-surface-800 border border-surface-700 rounded text-white text-sm"
                           />
-                        ) : (
+                        ) : isOwner ? (
                           <button
                             onClick={() => setEditingField(`${tx.id}-earnings`)}
                             className="text-primary-400 hover:text-primary-300 text-sm font-mono"
                           >
                             {format(new Date(tx.earnings_datetime), 'MMM d yyyy h:mm a')}
                           </button>
+                        ) : (
+                          <span className="text-primary-400 text-sm font-mono">
+                            {format(new Date(tx.earnings_datetime), 'MMM d yyyy h:mm a')}
+                          </span>
                         )}
                       </td>
                       <td className="p-4 text-right text-primary-500 font-bold font-mono">
@@ -504,8 +517,8 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {/* Archive Confirmation Modal */}
-      {showArchiveModal && (
+      {/* Archive Confirmation Modal - Owner only */}
+      {isOwner && showArchiveModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="card p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold text-white mb-2">Archive Selected Reports?</h3>

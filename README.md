@@ -1,22 +1,23 @@
-# PerexPastil - Point of Sale System
+# KASHPOS v1.0 - Sales Tracking System
 
-A modern, responsive Point of Sale system built with Next.js 14, TypeScript, Tailwind CSS, and Supabase.
+A modern, responsive Sales Tracking System built with Next.js 14, TypeScript, Tailwind CSS, and Supabase.
 
-![PerexPastil](https://img.shields.io/badge/PerexPastil-v1.0.0-green)
+![KASHPOS](https://img.shields.io/badge/KASHPOS-v1.0-green)
 
 ## Features
 
 - **🔐 Role-Based Access**
-  - Owner: Full access to all features
+  - Owner (Admin): Full access to all features
   - Cashier: Sales only
 
 - **🛒 Sales**
-  - Product selection with image preview
+  - Direct inventory item selection with image preview
+  - Custom quantity input (pieces)
   - Customer type selection
   - Payment method selection
-  - Quantity selection (weight or pieces)
   - Dine In/Takeout option (configurable)
-  - Real-time checkout
+  - Cart functionality with real-time totals
+  - Payment and change calculation
 
 - **📊 Reports**
   - Daily sales reports
@@ -27,14 +28,21 @@ A modern, responsive Point of Sale system built with Next.js 14, TypeScript, Tai
 - **📦 Inventory**
   - Product management (CRUD)
   - Image upload with automatic compression (100x100px, max 150KB)
-  - Stock tracking by weight or quantity
+  - Stock tracking by pieces
   - Cost and selling price management
+  - Automatic profit calculation
 
 - **💰 Earnings**
-  - Daily profit calculations (viewable after day ends)
+  - Daily profit calculations
   - Revenue, cost, and profit summary
+  - OPEX tracking with break-even analysis
   - Pie charts: Customer types, Payment methods, Dine In/Takeout
   - Line graphs for date range analysis
+
+- **📋 OPEX Management**
+  - Monthly operating expenses tracking
+  - Target sales configuration
+  - Break-even point monitoring
 
 - **⚙️ Settings**
   - Toggle Dine In/Takeout option
@@ -60,7 +68,7 @@ A modern, responsive Point of Sale system built with Next.js 14, TypeScript, Tai
 ### 1. Clone and Install
 
 ```bash
-cd PerexPastil
+cd "KashPOS v1"
 npm install
 ```
 
@@ -69,13 +77,13 @@ npm install
 Create a `.env.local` file in the project root:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://uwhinxqsgwwvwnvdxqvp.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3aGlueHFzZ3d3dndudmR4cXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5NjA2MjEsImV4cCI6MjA4MTUzNjYyMX0.DOgoRHsEzKoAgS5V26k-EbS_f9Dl0wgTL-ezU2m0Md8
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### 3. Setup Supabase Database
 
-1. Go to your [Supabase Dashboard](https://supabase.com/dashboard/project/uwhinxqsgwwvwnvdxqvp)
+1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
 2. Navigate to **SQL Editor**
 3. Copy the contents of `supabase-schema.sql` and run it
 4. Create a storage bucket:
@@ -95,10 +103,10 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## Login Credentials
 
-| Role    | Username         | Password         |
-|---------|------------------|------------------|
-| Owner   | adminPerexPastil | adminPerexPastil |
-| Cashier | admin            | admin            |
+| Role    | Username | Password |
+|---------|----------|----------|
+| Owner   | Admin    | Admin    |
+| Cashier | Cashier  | Cashier  |
 
 ## Deploying to Vercel
 
@@ -132,7 +140,7 @@ vercel --prod
 ## Project Structure
 
 ```
-PerexPastil/
+KashPOS v1/
 ├── src/
 │   ├── app/
 │   │   ├── globals.css
@@ -147,6 +155,7 @@ PerexPastil/
 │   │   └── pages/
 │   │       ├── EarningsPage.tsx
 │   │       ├── InventoryPage.tsx
+│   │       ├── OPEXPage.tsx
 │   │       ├── ReportsPage.tsx
 │   │       ├── SalesPage.tsx
 │   │       └── SettingsPage.tsx

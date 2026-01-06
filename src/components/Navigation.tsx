@@ -71,7 +71,10 @@ const navItems: { id: NavPage; label: string; icon: JSX.Element }[] = [
 export default function Navigation({ activePage, setActivePage, isCashier }: NavigationProps) {
   const { user } = useAuth()
 
-  const visibleItems = isCashier ? navItems.filter((item) => item.id === 'sales') : navItems
+  // Cashier can access Sales and Reports (view-only)
+  const visibleItems = isCashier 
+    ? navItems.filter((item) => item.id === 'sales' || item.id === 'reports') 
+    : navItems
 
   return (
     <>
@@ -87,7 +90,7 @@ export default function Navigation({ activePage, setActivePage, isCashier }: Nav
             </div>
             <div>
               <h1 className="text-lg font-bold text-white">KASHPOS</h1>
-              <p className="text-xs text-surface-500">v2.0</p>
+              <p className="text-xs text-surface-500">v1.0</p>
             </div>
           </div>
         </div>

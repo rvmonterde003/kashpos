@@ -406,9 +406,14 @@ export default function EarningsPage() {
       }`}>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h3 className={`font-semibold ${isBreakEvenReached ? 'text-green-400' : 'text-yellow-400'}`}>
-              {isBreakEvenReached ? '✓ Break-Even Reached!' : 'Monthly OPEX Status'}
-            </h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className={`font-semibold ${isBreakEvenReached ? 'text-green-400' : 'text-yellow-400'}`}>
+                {isBreakEvenReached ? '✓ Break-Even Reached!' : 'Monthly OPEX Status'}
+              </h3>
+              <span className="px-2 py-0.5 bg-surface-700 text-surface-300 text-xs rounded-full">
+                {format(new Date(), 'MMMM yyyy')}
+              </span>
+            </div>
             {isBreakEvenReached ? (
               <p className="text-green-400/80 text-sm mt-1">
                 Break-even reached on {breakEvenDate ? format(breakEvenDate, 'MMM d, yyyy h:mm a') : 'this month'}. 
@@ -427,6 +432,9 @@ export default function EarningsPage() {
             </p>
             <p className="text-surface-500 text-xs mt-1">
               Monthly OPEX: ₱{totalMonthlyOpex.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-surface-600 text-xs mt-1">
+              Resets: {format(startOfMonth(new Date()), 'MMMM yyyy')}
             </p>
           </div>
         </div>

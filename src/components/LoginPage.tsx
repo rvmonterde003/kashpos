@@ -75,7 +75,7 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-white mb-1">KASHPOS</h1>
-          <p className="text-primary-400 text-sm font-medium mb-2">v2.0</p>
+          <p className="text-primary-400 text-sm font-medium mb-2">v1.0</p>
           <p className="text-surface-400">Sign in to your account</p>
         </div>
 

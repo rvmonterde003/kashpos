@@ -14,8 +14,8 @@ const jetbrains = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'PerexPastil - Point of Sale',
-  description: 'Modern point of sale system',
+  title: 'KASHPOS v1.0 - Sales Tracking System',
+  description: 'Sales tracking system with earnings, inventory and OPEX tracking',
 }
 
 export default function RootLayout({

@@ -6,7 +6,6 @@ export interface Database {
           id: string
           name: string
           image_url: string | null
-          unit_type: 'weight' | 'quantity' | 'volume'
           qty: number
           cost: number
           selling_price: number
@@ -16,26 +15,12 @@ export interface Database {
         Insert: Omit<Database['public']['Tables']['products']['Row'], 'id' | 'created_at' | 'updated_at'>
         Update: Partial<Database['public']['Tables']['products']['Insert']>
       }
-      finished_products: {
-        Row: {
-          id: string
-          name: string
-          image_url: string | null
-          selling_price: number
-          opex_cost: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: Omit<Database['public']['Tables']['finished_products']['Row'], 'id' | 'created_at' | 'updated_at'>
-        Update: Partial<Database['public']['Tables']['finished_products']['Insert']>
-      }
       sales: {
         Row: {
           id: string
           product_id: string
           product_name: string
           qty: number
-          unit_type: 'weight' | 'quantity' | 'volume'
           cost: number
           selling_price: number
           total: number
@@ -49,7 +34,6 @@ export interface Database {
           earnings_datetime: string | null
           customer_payment: number | null
           transaction_number: string | null
-          opex_cost: number | null
         }
         Insert: Omit<Database['public']['Tables']['sales']['Row'], 'id' | 'created_at' | 'cancelled' | 'cancelled_at'>
         Update: Partial<Database['public']['Tables']['sales']['Insert'] & { cancelled: boolean; cancelled_at: string | null }>
@@ -111,15 +95,12 @@ export interface Database {
 }
 
 export type Product = Database['public']['Tables']['products']['Row']
-export type FinishedProduct = Database['public']['Tables']['finished_products']['Row']
 export type Sale = Database['public']['Tables']['sales']['Row']
 export type PaymentMethod = Database['public']['Tables']['payment_methods']['Row']
 export type CustomerType = Database['public']['Tables']['customer_types']['Row']
 export type Setting = Database['public']['Tables']['settings']['Row']
 export type Opex = Database['public']['Tables']['opex']['Row']
 export type OpexSettings = Database['public']['Tables']['opex_settings']['Row']
-
-export type UnitType = 'weight' | 'quantity' | 'volume'
 
 export type UserRole = 'owner' | 'cashier'
 
@@ -131,9 +112,6 @@ export interface User {
 export interface CartItem {
   product: Product
   qty: number
-  customerType: string
-  paymentMethod: string
-  dineInTakeout: 'dine_in' | 'takeout' | null
 }
 
 export interface RecentSale {

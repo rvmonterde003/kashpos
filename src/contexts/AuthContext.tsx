@@ -13,8 +13,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 const USERS: { username: string; password: string; role: UserRole }[] = [
-  { username: 'owner', password: 'owner123', role: 'owner' },
-  { username: 'cashier', password: 'cashier123', role: 'cashier' },
+  { username: 'Admin', password: 'Admin', role: 'owner' },
+  { username: 'Cashier', password: 'Cashier', role: 'cashier' },
 ]
 
 export function AuthProvider({ children }: { children: ReactNode }) {
