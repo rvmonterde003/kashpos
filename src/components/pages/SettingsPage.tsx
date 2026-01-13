@@ -28,6 +28,7 @@ const COLOR_OPTIONS = [
 
 export default function SettingsPage() {
   const { user, logout } = useAuth()
+  const isCashier = user?.role === 'cashier'
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([])
   const [customerTypes, setCustomerTypes] = useState<CustomerType[]>([])
   const [loading, setLoading] = useState(true)
@@ -56,8 +57,12 @@ export default function SettingsPage() {
   }, [])
 
   useEffect(() => {
+    if (isCashier) {
+      setLoading(false)
+      return
+    }
     fetchData()
-  }, [fetchData])
+  }, [fetchData, isCashier])
 
   const addPaymentMethod = async () => {
     if (!newPaymentMethod.name.trim()) {
@@ -141,6 +146,44 @@ export default function SettingsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // Cashier: show logout only
+  if (isCashier) {
+    return (
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-white">Settings</h1>
+          <p className="text-surface-400 text-sm mt-1">Account actions</p>
+        </div>
+
+        <div className="card p-6">
+          <h3 className="text-lg font-semibold text-white mb-4">Account</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-surface-700 flex items-center justify-center">
+                <span className="text-lg font-medium text-white">
+                  {user?.username.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <p className="text-white font-medium">{user?.username}</p>
+                <p className="text-surface-400 text-sm capitalize">{user?.role}</p>
+              </div>
+            </div>
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-4 py-2 text-red-400 hover:text-white hover:bg-red-500 rounded-lg transition-colors border border-red-500/30"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="font-medium">Logout</span>
+            </button>
+          </div>
+        </div>
       </div>
     )
   }

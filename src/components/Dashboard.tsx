@@ -30,8 +30,8 @@ export default function Dashboard() {
   const isCashier = user?.role === 'cashier'
 
   const renderPage = () => {
-    // Cashier can only access Sales and Reports
-    if (isCashier && activePage !== 'sales' && activePage !== 'reports') {
+    // Cashier can access Sales, Reports, and Settings (logout only)
+    if (isCashier && activePage !== 'sales' && activePage !== 'reports' && activePage !== 'settings') {
       setActivePage('sales')
       return <SalesPage />
     }
