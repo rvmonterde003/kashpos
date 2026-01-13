@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS products (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
   name TEXT NOT NULL,
   image_url TEXT,
-  unit_type TEXT NOT NULL CHECK (unit_type IN ('weight', 'quantity')),
   qty DECIMAL(10, 2) NOT NULL DEFAULT 0,
   cost DECIMAL(10, 2) NOT NULL DEFAULT 0,
   selling_price DECIMAL(10, 2) NOT NULL DEFAULT 0,
@@ -23,7 +22,6 @@ CREATE TABLE IF NOT EXISTS sales (
   product_id UUID REFERENCES products(id) ON DELETE SET NULL,
   product_name TEXT NOT NULL,
   qty DECIMAL(10, 2) NOT NULL,
-  unit_type TEXT NOT NULL CHECK (unit_type IN ('weight', 'quantity')),
   cost DECIMAL(10, 2) NOT NULL,
   selling_price DECIMAL(10, 2) NOT NULL,
   total DECIMAL(10, 2) NOT NULL,
@@ -32,7 +30,11 @@ CREATE TABLE IF NOT EXISTS sales (
   dine_in_takeout TEXT CHECK (dine_in_takeout IN ('dine_in', 'takeout', NULL)),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   cancelled BOOLEAN DEFAULT FALSE,
-  cancelled_at TIMESTAMP WITH TIME ZONE
+  cancelled_at TIMESTAMP WITH TIME ZONE,
+  transaction_id UUID,
+  transaction_number TEXT,
+  customer_payment DECIMAL(10, 2),
+  earnings_datetime TIMESTAMP WITH TIME ZONE
 );
 
 -- Payment methods table

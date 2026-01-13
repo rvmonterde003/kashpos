@@ -253,6 +253,7 @@ export default function SalesPage() {
         customer_type: selectedCustomerType,
         dine_in_takeout: selectedDineInTakeout,
         customer_payment: paymentAmount,
+        earnings_datetime: new Date().toISOString(),
       }))
       
       const { data: saleData, error: saleError } = await (supabase as any)
@@ -262,6 +263,8 @@ export default function SalesPage() {
 
       if (saleError) {
         console.error('Sale insert error:', saleError)
+        console.error('Sale records attempted:', saleRecords)
+        toast.error(`Sale failed: ${saleError.message || 'Database error'}`)
         throw saleError
       }
 
